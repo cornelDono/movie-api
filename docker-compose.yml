@@ -12,5 +12,24 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  movie-api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: movie-api
+    volumes:
+      - ./:/app
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+
 volumes:
   db_data:

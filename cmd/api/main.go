@@ -95,6 +95,7 @@ func loadConfig() (config, error) {
 			db_name:  os.Getenv("DB_NAME"),
 		},
 	}
+	fmt.Println("adfadfadf")
 
 	return cfg, nil
 }
