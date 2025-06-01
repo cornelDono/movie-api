@@ -14,7 +14,7 @@ import (
 
 const version = "1.0.0"
 
-type potsgresConfig struct {
+type postgresConfig struct {
 	user     string
 	password string
 	host     string
@@ -24,7 +24,7 @@ type potsgresConfig struct {
 type config struct {
 	port int
 	env  string
-	db   potsgresConfig
+	db   postgresConfig
 }
 
 type application struct {
@@ -60,8 +60,8 @@ func main() {
 	}
 
 	logger.Printf("starting %s severs on %s", cfg.env, srv.Addr)
-	listen_err := srv.ListenAndServe()
-	logger.Fatal(listen_err)
+	listenErr := srv.ListenAndServe()
+	logger.Fatal(listenErr)
 }
 
 func openDB(cfg config) (*pgxpool.Pool, error) {
@@ -87,7 +87,7 @@ func loadConfig() (config, error) {
 	cfg := config{
 		port: 4000,
 		env:  "development",
-		db: potsgresConfig{
+		db: postgresConfig{
 			user:     os.Getenv("DB_USER"),
 			password: os.Getenv("DB_PASSWORD"),
 			host:     os.Getenv("DB_HOST"),
@@ -95,7 +95,6 @@ func loadConfig() (config, error) {
 			db_name:  os.Getenv("DB_NAME"),
 		},
 	}
-	fmt.Println("adfadfadf")
 
 	return cfg, nil
 }
