@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"movie_api.net/internal/data"
 	"net/http"
 	"os"
 	"time"
@@ -19,7 +20,7 @@ type postgresConfig struct {
 	password string
 	host     string
 	port     string
-	db_name  string
+	dbName   string
 }
 type config struct {
 	port int
@@ -30,6 +31,7 @@ type config struct {
 type application struct {
 	config config
 	logger *log.Logger
+	models data.Models
 }
 
 func main() {
@@ -49,6 +51,7 @@ func main() {
 	app := application{
 		config: cfg,
 		logger: logger,
+		models: data.NewModels(dbpool),
 	}
 
 	srv := &http.Server{
@@ -65,17 +68,11 @@ func main() {
 }
 
 func openDB(cfg config) (*pgxpool.Pool, error) {
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", cfg.db.user, cfg.db.password, cfg.db.host, cfg.db.port, cfg.db.db_name)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", cfg.db.user, cfg.db.password, cfg.db.host, cfg.db.port, cfg.db.dbName)
 	dbpool, err := pgxpool.New(context.Background(), dsn)
 	dbpool.Config().MaxConnIdleTime, _ = time.ParseDuration("15m")
 	dbpool.Config().MaxConns = 50
 
-	if err != nil {
-		return nil, err
-	}
-
-	var greeting string
-	err = dbpool.QueryRow(context.Background(), "select 'Hello, world!'").Scan(&greeting)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +89,7 @@ func loadConfig() (config, error) {
 			password: os.Getenv("DB_PASSWORD"),
 			host:     os.Getenv("DB_HOST"),
 			port:     os.Getenv("DB_PORT"),
-			db_name:  os.Getenv("DB_NAME"),
+			dbName:   os.Getenv("DB_NAME"),
 		},
 	}
 
